@@ -1,0 +1,21 @@
+[project]
+name = "veil-browser"
+version = "2.0.0"
+description = "Privacy-first web browser designed to eliminate tracking, data collection, and intrusive analytics"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "psutil~=5.9.8",
+]
+
+[project.optional-dependencies]
+pyqt = [
+    "PyQt6>=6.9.0",
+    "PyQt6-WebEngine>=6.9.0",
+]
+
+[tool.basedpyright]
+typeCheckingMode = "standard"
+reportUnknownMemberType = false
+reportUnknownArgumentType = false
+reportUnknownVariableType = false
