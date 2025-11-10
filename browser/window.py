@@ -143,9 +143,11 @@ class VeilBrowser(QMainWindow):
         address_focus = QShortcut(QKeySequence("Ctrl+L"), self)
         address_focus.activated.connect(self.focus_address_bar)
 
-        # Opening dev tools: F12
-        devtools_shortcut = QShortcut(QKeySequence("F12"), self)
-        devtools_shortcut.activated.connect(self.toggle_devtools)
+        # Opening dev tools: F12 and Ctrl+Shift+I
+        devtools_f12_shortcut = QShortcut(QKeySequence("F12"), self)
+        devtools_f12_shortcut.activated.connect(self.toggle_devtools)
+        devtools_ctrl_shift_i_shortcut = QShortcut(QKeySequence("Ctrl+Shift+I"), self)
+        devtools_ctrl_shift_i_shortcut.activated.connect(self.toggle_devtools)
 
     def create_new_tab(self):
         """Create a new tab"""
