@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from PyQt6.QtGui import QColor, QIcon, QPalette
+from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtWidgets import QToolButton, QWidget, QTabWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QUrl, pyqtSignal
@@ -166,3 +167,18 @@ class TabWidget(QTabWidget):
         new_tab_btn.setText("+")
         new_tab_btn.setToolTip("New Tab")
         self.setCornerWidget(new_tab_btn)
+
+    def request_dev_tools(self):
+        tab = self.get_current_web_view()  # Get your current web view
+        if not tab:
+            return
+        page = tab.page()
+        if not page:
+            return
+
+        # Create a new window/view for DevTools
+        devtools_page = QWebEnginePage()
+
+        # Connect the inspector to the current page
+        page.setDevToolsPage(devtools_page)
+        page.triggerAction(QWebEnginePage.WebAction.InspectElement)

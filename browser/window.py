@@ -1,3 +1,4 @@
+from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -35,6 +36,7 @@ class VeilBrowser(QMainWindow):
             return
 
         self.instance = instance
+        self.devtools_view: QWebEngineView | None = None
 
     def init_ui(self):
         main_widget = QWidget()
@@ -89,6 +91,29 @@ class VeilBrowser(QMainWindow):
         self.refresh_btn.update_icon("refresh", QIcon.ThemeIcon.ViewRefresh, is_dark)
         self.home_btn.update_icon("home", QIcon.ThemeIcon.GoHome, is_dark)
 
+    def toggle_devtools(self):
+        if self.devtools_view is None or not self.devtools_view.isVisible():
+            self.devtools_view = QWebEngineView()
+            self.devtools_view.setWindowTitle("Developer Tools")
+            self.devtools_view.resize(1024, 600)
+
+            devtools_page = self.devtools_view.page()
+
+            web_view = self.tab_widget.get_current_web_view()
+            if not web_view:
+                logger.info("Web view is not found!")
+                return
+
+            page = web_view.page()
+            if not page:
+                logger.info("Page is not found!")
+                return
+
+            page.setDevToolsPage(devtools_page)
+            self.devtools_view.show()
+        else:
+            self.devtools_view.hide()
+
     def setup_shortcuts(self):
         """Setup keyboard shortcuts for tab management"""
         # New tab: Ctrl+T
@@ -117,6 +142,10 @@ class VeilBrowser(QMainWindow):
         # Address bar focus: Ctrl+L
         address_focus = QShortcut(QKeySequence("Ctrl+L"), self)
         address_focus.activated.connect(self.focus_address_bar)
+
+        # Opening dev tools: F12
+        devtools_shortcut = QShortcut(QKeySequence("F12"), self)
+        devtools_shortcut.activated.connect(self.toggle_devtools)
 
     def create_new_tab(self):
         """Create a new tab"""
