@@ -4,4 +4,4 @@
 # Security Policy
 This is an experimental project, unstable and not up to today's standards of a "browser".
 
-We don't recommend using this browser as a daily-use tool. Feel free to report any issues here or on the [**Original**](https://github.com/Souvlaki42/Veil-Browser).
+We don't recommend using this browser as a daily-use tool. Feel free to report any issues.
