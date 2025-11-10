@@ -15,6 +15,8 @@ from browser.adblock import AdBlockInterceptor
 from browser.data import read_config, setup_logging
 from browser.qt import ToolButton, TabWidget
 
+import pyperclip
+
 logger = setup_logging()
 
 
@@ -160,6 +162,16 @@ class VeilBrowser(QMainWindow):
         devtools_ctrl_shift_i_shortcut = QShortcut(QKeySequence("Ctrl+Shift+I"), self)
         devtools_ctrl_shift_i_shortcut.activated.connect(self.toggle_devtools)
 
+        # Copy address bar to clipboard: Ctrl+Shift+C
+        copy_address_shortcut = QShortcut(QKeySequence("Ctrl+Shift+C"), self)
+        copy_address_shortcut.activated.connect(self.copy_address_bar_to_clipboard)
+
+        # Duplicate tab: Ctrl+D
+        duplicate_tab = QShortcut(QKeySequence("Ctrl+D"), self)
+        duplicate_tab.activated.connect(
+            lambda: self.tab_widget.create_new_tab(self.address_bar.text())
+        )
+
     def create_new_tab(self):
         """Create a new tab"""
         self.tab_widget.create_new_tab()
@@ -187,6 +199,12 @@ class VeilBrowser(QMainWindow):
         """Focus the address bar and select all text"""
         self.address_bar.setFocus()
         self.address_bar.selectAll()
+
+    def copy_address_bar_to_clipboard(self):
+        """Copy the contents of the address bar to system clipboard"""
+        content = self.address_bar.text().strip()
+        if not content == "":
+            pyperclip.copy(content)
 
     def go_back(self):
         """Go back in current tab"""
