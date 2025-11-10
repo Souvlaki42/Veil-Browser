@@ -5,7 +5,7 @@ description = "Privacy-first web browser designed to eliminate tracking, data co
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "psutil~=5.9.8",
+    "psutil~=7.1.3",
 ]
 
 [project.optional-dependencies]

@@ -2,128 +2,162 @@
 
 # Veil Browser
 
-This project was originally made by [ThatSINEWAVE](https://github.com/ThatSINEWAVE).
+_Privacy-first web browsing, reimagined_
 
 ![Veil-Browser](https://raw.githubusercontent.com/Souvlaki42/Veil-Browser/refs/heads/main/.github/SCREENSHOTS/browser.png)
 
-Veil Browser is a privacy-first web browser designed to eliminate tracking, data collection, and intrusive analytics. It is fully open-source and built with the goal of providing a truly private browsing experience. The project is currently in its early development stage and remains highly unstable.
+**A modern, open-source browser designed to eliminate tracking and protect your privacy**
+
+---
+
+### **Contributors**
+
+- **Developer**: [Souvlaki42](https://github.com/Souvlaki42)
+- **Fork by**: [umaera](https://github.com/NotYarazi)
+- **Original Creator**: [ThatSINEWAVE](https://github.com/ThatSINEWAVE)
 
 </div>
 
-## Planned Features
+## Features
 
-- 🚫 **No Trackers** – No hidden tracking, telemetry, or data collection.
-- 🔓 **Open Source** – Fully transparent code for community-driven development.
-- 🎭 **Custom UI** – A unique, modern, and minimalist interface.
-- 🛠 **No Bloat** – Stripped-down browsing experience without unnecessary features.
-- 🏴 **Privacy by Design** – Enforced privacy-focused settings by default.
+<table>
+<tr>
+<td width="50%">
+
+### **Privacy First**
+
+- Zero tracking & telemetry
+- Privacy by design
+- No data collection
+
+</td>
+<td width="50%">
+
+### **Clean Experience**
+
+- Minimalist UI
+- No bloatware & unnecessary stuff
+- Lightweight & fast
+
+</td>
+</tr>
+</table>
+
+**Fully Open Source** – Transparent, community-driven development
+
+---
 
 ## Current Status
 
-Veil Browser is in **early development** and is currently **unstable and mostly unusable**. Key functionalities, such as smooth navigation and stability, are still under development.
+> **⚠️ Development Stage**: Veil Browser is in early development. Expect instability and limited functionality.
 
-## Prerequisites
+> **🚨 Not ready for daily use yet!** This browser is under active development. Expect bugs, crashes, and missing features.
 
-- [Python 3.10+](https://www.python.org/downloads/)
-- [UV](https://docs.astral.sh/uv/getting-started/installation/#installation-methods)
+## Quick Start
 
-## Installation
+### Prerequisites
 
-1. Clone the repository:
+- **Python 3.10+** → [Download here](https://www.python.org/downloads/)
+- **UV Package Manager** (virtual environment - optional) → [Install UV](https://docs.astral.sh/uv/getting-started/installation/#installation-methods)
+
+### Installation (virtual environment)
 
 ```bash
+# 1. Clone the repository
 git clone git@github.com:Souvlaki42/Veil-Browser.git
 cd Veil-Browser
+
+# 2. Setup environment
+uv venv
+uv sync --extra pyqt
+
+# 3. Launch Veil Browser
+uv run main.py
 ```
 
-### For Arch Linux users (recommended for proprietary codec support)
-
-1. Install system PyQt6 packages:
+<details>
+<summary><b>Linux Installation (Click)</b></summary>
 
 ```bash
+# Install system packages for codec support
 sudo pacman -Sy --needed python-pyqt6 python-pyqt6-webengine
-```
 
-2. Create environment with system package access:
-
-```bash
+# Create environment with system packages
 uv venv --system-site-packages
 uv sync
 ```
 
-**Note:** The system PyQt6 includes proprietary codecs (H.264, AAC) by default.
+</details>
 
-### For other platforms
-
-Install with PyQt6 from PyPI:
-
-```bash
-uv venv
-uv sync --extra pyqt
-```
-
-**Note:** PyPI PyQt6 does not include proprietary codecs.
-
-### Verify Installation
+<details>
+<summary><b>Alternative: Install without virtual enviroment</b></summary>
 
 ```bash
-python -c "import PyQt6; print(PyQt6)"
+pip install -r requirements.txt
+python main.py
 ```
 
-If the path includes `/usr/lib/python3.x/`, you're using system packages with codec support.
+</details>
 
-### After installation
+### Auto-created files:
 
-Run the application:
-
-```bash
-uv run main.py
-```
-
-The application will automatically create:
-
-- `data/history.json`: Browsing history storage.
-- `data/config.json`: Browser configuration file.
-- `data/logs/`: Application log directory.
-
-## Known Issues
-
-- Navigation issues and broken rendering.
-- Limited functionality beyond basic browsing.
+- `data/config.json` - Browser settings
+- `data/history.json` - Browsing history
+- `data/logs/` - Application logs
 
 ## Roadmap
 
-- [ ] Add an integrated ad and tracker blocker.
-- [ ] Enhance the UI with more customization options.
-- [ ] Add site options and auto play.
-- [ ] Add persistent storage.
-- [ ] Add incognito mode.
-- [ ] Add keyboard shortcuts.
-- [ ] Add chrome devtools.
+<table>
+<tr>
+<td width="50%">
 
-## Other credits
+### **Coming Soon**
 
-- Icons use [this font](https://github.com/google/material-design-icons/blob/master/variablefont/MaterialSymbolsOutlined%5BFILL%2CGRAD%2Copsz%2Cwght%5D.ttf)
+- [x] Keyboard shortcuts
+- [x] Tab support
+- [ ] Ad & tracker blocker
+- [ ] Incognito mode
+
+</td>
+<td width="50%">
+
+### **Future Plans**
+
+- [ ] UI customization
+- [ ] Site-specific settings
+- [ ] Developer tools
+- [ ] Enhanced storage
+
+</td>
+</tr>
+</table>
 
 <div align="center">
 
-## [Join my discord server](https://moulas.dev/discord)
+## Get Involved
+
+### **Community**
+
+[![Discord](https://img.shields.io/badge/Discord-Join%20Server-7289da?style=for-the-badge&logo=discord)](https://moulas.dev/discord)
+
+### **Contribute**
+
+Found a bug? Have an idea? **Contributions welcome!**
+
+- Report issues
+- Submit feature requests
+- Create pull requests
+
+> Core browser logic is in the `browser/` package
+
+---
+
+## License & Credits
+
+**License**: GPL-3.0 License - See [LICENSE](LICENSE)
+
+**Icons**: [Material Design Icons](https://github.com/google/material-design-icons/blob/master/variablefont/MaterialSymbolsOutlined%5BFILL%2CGRAD%2Copsz%2Cwght%5D.ttf)
+
+---
 
 </div>
-
-## Contributions
-
-Contributions are welcome! Feel free to fork the repository, submit issues, and open pull requests.
-Please note:
-
-- Core browser logic is in `browser/` package
-
-## License
-
-This project is licensed under the GPL-3.0 License. See [LICENSE](LICENSE) for more details.
-
-## Disclaimer
-
-This browser is **not yet suitable for daily use**. Expect bugs, crashes, and missing features as development progresses.
-
-Stay tuned for updates and improvements as we work toward making Veil Browser a truly private and reliable browsing solution!

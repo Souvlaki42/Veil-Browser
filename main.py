@@ -19,7 +19,8 @@ def main():
         config = read_config()
 
         logger.info("=" * 50)
-        logger.info(f"🌐 Veil Browser v{config['local_version']} - Application Startup")
+        logger.info(f"Veil Browser v{config['local_version']} (fork/remix by UmaEra)")
+        logger.info("Starting...")
         logger.info("=" * 50)
 
         app = QApplication(sys.argv)
@@ -48,13 +49,13 @@ def main():
             mem_available: float = cast(int, mem.available) / (1024**3)
             logger.info(f"Memory Available: {mem_available:.1f} GB")
         except Exception as e:
-            logger.error(f"Memory check failed: {e}")
+            logger.error(f"[ERR] Memory check failed: {e}")
 
         exit_code = app.exec()
         sys.exit(exit_code)
 
     except Exception as e:
-        logger.critical(f"Fatal error: {str(e)}", exc_info=True)
+        logger.critical(f"[FATAL] Error: {str(e)}", exc_info=True)
         sys.exit(1)
 
 

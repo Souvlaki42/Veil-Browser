@@ -1,0 +1,17 @@
+# Core GUI Framework
+PyQt6>=6.9.0,<7.0.0
+
+# Web Engine for browser functionality  
+PyQt6-WebEngine>=6.9.0,<7.0.0
+
+# System information and process management
+psutil>=5.9.8,<8.0.0
+
+# Python version requirement (documented for reference)
+# Requires Python >=3.10
+
+# Optional: Development and testing dependencies
+# Uncomment if needed for development:
+# pytest>=7.0.0
+# black>=23.0.0
+# mypy>=1.0.0
