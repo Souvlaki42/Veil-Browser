@@ -1,3 +1,4 @@
+from PyQt6.QtWebEngineCore import QWebEngineProfile
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import (
     QApplication,
@@ -10,6 +11,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import QPoint, QUrl, Qt
 from PyQt6.QtGui import QIcon, QKeySequence, QShortcut
 
+from browser.adblock import AdBlockInterceptor
 from browser.data import read_config, setup_logging
 from browser.qt import ToolButton, TabWidget
 
@@ -36,7 +38,16 @@ class VeilBrowser(QMainWindow):
             return
 
         self.instance = instance
+
         self.devtools_view: QWebEngineView | None = None
+
+        self.profile = QWebEngineProfile.defaultProfile()
+        if not self.profile:
+            logger.warning("[WARNING] Profile not found!")
+            return
+
+        ad_blocker = AdBlockInterceptor()
+        self.profile.setUrlRequestInterceptor(ad_blocker)
 
     def init_ui(self):
         main_widget = QWidget()

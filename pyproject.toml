@@ -5,6 +5,7 @@ description = "Privacy-first web browser designed to eliminate tracking, data co
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "adblock>=0.6.0",
     "psutil~=7.1.3",
 ]
 
