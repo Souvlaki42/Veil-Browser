@@ -12,9 +12,9 @@ _Privacy-first web browsing, reimagined_
 
 ### **Contributors**
 
-- **Developer**: [Souvlaki42](https://github.com/Souvlaki42)
-- **Fork by**: [umaera](https://github.com/NotYarazi)
-- **Original Creator**: [ThatSINEWAVE](https://github.com/ThatSINEWAVE)
+**Developer**: [Souvlaki42](https://github.com/Souvlaki42) \
+**Fork by**: [umaera](https://github.com/NotYarazi) \
+**Original Creator**: [ThatSINEWAVE](https://github.com/ThatSINEWAVE)
 
 </div>
 
@@ -76,7 +76,7 @@ uv run main.py
 ```
 
 <details>
-<summary><b>Linux Installation (Click)</b></summary>
+<summary><b>Arch Linux Installation</b></summary>
 
 ```bash
 # Install system packages for codec support
@@ -125,7 +125,7 @@ python main.py
 
 - [ ] UI customization
 - [ ] Site-specific settings
-- [ ] Developer tools
+- [x] Developer tools
 - [ ] Enhanced storage
 
 </td>
@@ -144,9 +144,9 @@ python main.py
 
 Found a bug? Have an idea? **Contributions welcome!**
 
-- Report issues
-- Submit feature requests
-- Create pull requests
+Report issues
+Submit feature requests
+Create pull requests
 
 > Core browser logic is in the `browser/` package
 
