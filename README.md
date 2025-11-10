@@ -13,13 +13,11 @@ _Privacy-first web browsing, reimagined_
 ### **Contributors**
 
 **Developer**: [Souvlaki42](https://github.com/Souvlaki42) \
-**Fork by**: [umaera](https://github.com/NotYarazi) \
+**Developer**: [umaera](https://github.com/NotYarazi) \
 **Original Creator**: [ThatSINEWAVE](https://github.com/ThatSINEWAVE)
 
-</div>
 
 ## Features
-
 <table>
 <tr>
 <td width="50%">
@@ -57,7 +55,7 @@ _Privacy-first web browsing, reimagined_
 
 ### Prerequisites
 
-- **Python 3.10+** → [Download here](https://www.python.org/downloads/)
+- **Python 3.12+** → [Download here](https://www.python.org/downloads/)
 - **UV Package Manager** (virtual environment - optional) → [Install UV](https://docs.astral.sh/uv/getting-started/installation/#installation-methods)
 
 ### Installation (virtual environment)
