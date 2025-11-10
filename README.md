@@ -53,6 +53,8 @@ _Privacy-first web browsing, reimagined_
 
 ## Quick Start
 
+</div>
+
 ### Prerequisites
 
 - **Python 3.12+** → [Download here](https://www.python.org/downloads/)
@@ -102,7 +104,8 @@ python main.py
 - `data/config.json` - Browser settings
 - `data/history.json` - Browsing history
 - `data/logs/` - Application logs
-
+<div align="center">
+  
 ## Roadmap
 
 <table>
