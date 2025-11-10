@@ -87,6 +87,7 @@ class TabWidget(QTabWidget):
         web_view.loadStarted.connect(
             lambda: self._update_tab_title(web_view, "Loading...")
         )
+        web_view.iconChanged.connect(lambda icon: self._update_tab_icon(web_view, icon))
 
         # Add tab
         tab_index = self.addTab(web_view, "New Tab")
@@ -133,6 +134,13 @@ class TabWidget(QTabWidget):
                 # Limit title length
                 display_title = title[:30] + "..." if len(title) > 30 else title
                 self.setTabText(i, display_title or "Untitled")
+                break
+
+    def _update_tab_icon(self, web_view: QWebEngineView, icon: QIcon) -> None:
+        """Update the favicon of a tab"""
+        for i in range(self.count()):
+            if self.widget(i) == web_view:
+                self.setTabIcon(i, icon)
                 break
 
     def _on_tab_changed(self, index: int) -> None:

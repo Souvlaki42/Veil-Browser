@@ -6,7 +6,6 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QWidget,
 )
-from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QPoint, QUrl, Qt
 from PyQt6.QtGui import QIcon, QKeySequence, QShortcut
 
@@ -56,8 +55,6 @@ class VeilBrowser(QMainWindow):
         self.home_btn = ToolButton(
             lambda: self.navigate(self.config["homepage"]),
         )
-        self.new_tab_btn = ToolButton(self.create_new_tab)
-
         self.address_bar: QLineEdit = QLineEdit()
         self.address_bar.returnPressed.connect(lambda: self.navigate(None))
 
@@ -75,14 +72,13 @@ class VeilBrowser(QMainWindow):
         nav_bar.addWidget(self.forward_btn)
         nav_bar.addWidget(self.refresh_btn)
         nav_bar.addWidget(self.home_btn)
-        nav_bar.addWidget(self.new_tab_btn)
         nav_bar.addWidget(self.address_bar)
 
         layout.addLayout(nav_bar)
         layout.addWidget(self.tab_widget)
 
         self.setCentralWidget(main_widget)
-        
+
         # Setup keyboard shortcuts
         self.setup_shortcuts()
 
@@ -92,77 +88,76 @@ class VeilBrowser(QMainWindow):
         self.forward_btn.update_icon("arrow_forward", QIcon.ThemeIcon.GoNext, is_dark)
         self.refresh_btn.update_icon("refresh", QIcon.ThemeIcon.ViewRefresh, is_dark)
         self.home_btn.update_icon("home", QIcon.ThemeIcon.GoHome, is_dark)
-        self.new_tab_btn.update_icon("add", QIcon.ThemeIcon.ListAdd, is_dark)
 
     def setup_shortcuts(self):
         """Setup keyboard shortcuts for tab management"""
         # New tab: Ctrl+T
         new_tab_shortcut = QShortcut(QKeySequence("Ctrl+T"), self)
         new_tab_shortcut.activated.connect(self.create_new_tab)
-        
+
         # Close tab: Ctrl+W
         close_tab_shortcut = QShortcut(QKeySequence("Ctrl+W"), self)
         close_tab_shortcut.activated.connect(self.close_current_tab)
-        
+
         # Next tab: Ctrl+Tab
         next_tab_shortcut = QShortcut(QKeySequence("Ctrl+Tab"), self)
         next_tab_shortcut.activated.connect(self.next_tab)
-        
+
         # Previous tab: Ctrl+Shift+Tab
         prev_tab_shortcut = QShortcut(QKeySequence("Ctrl+Shift+Tab"), self)
         prev_tab_shortcut.activated.connect(self.previous_tab)
-        
+
         # Refresh: F5 or Ctrl+R
         refresh_f5 = QShortcut(QKeySequence("F5"), self)
         refresh_f5.activated.connect(self.refresh_page)
-        
+
         refresh_ctrl_r = QShortcut(QKeySequence("Ctrl+R"), self)
         refresh_ctrl_r.activated.connect(self.refresh_page)
-        
+
         # Address bar focus: Ctrl+L
         address_focus = QShortcut(QKeySequence("Ctrl+L"), self)
         address_focus.activated.connect(self.focus_address_bar)
-    
+
     def create_new_tab(self):
         """Create a new tab"""
         self.tab_widget.create_new_tab()
-    
+
     def close_current_tab(self):
         """Close the current tab"""
         current_index = self.tab_widget.currentIndex()
         self.tab_widget.close_tab(current_index)
-    
+
     def next_tab(self):
         """Switch to next tab"""
         current = self.tab_widget.currentIndex()
         count = self.tab_widget.count()
         next_index = (current + 1) % count
         self.tab_widget.setCurrentIndex(next_index)
-    
+
     def previous_tab(self):
         """Switch to previous tab"""
         current = self.tab_widget.currentIndex()
         count = self.tab_widget.count()
         prev_index = (current - 1) % count
         self.tab_widget.setCurrentIndex(prev_index)
-    
+
     def focus_address_bar(self):
         """Focus the address bar and select all text"""
         self.address_bar.setFocus()
         self.address_bar.selectAll()
-    
+
     def go_back(self):
         """Go back in current tab"""
         web_view = self.tab_widget.get_current_web_view()
         if web_view:
             web_view.back()
-    
+
     def go_forward(self):
         """Go forward in current tab"""
         web_view = self.tab_widget.get_current_web_view()
         if web_view:
             web_view.forward()
-    
+
     def refresh_page(self):
         """Refresh current tab"""
         web_view = self.tab_widget.get_current_web_view()
