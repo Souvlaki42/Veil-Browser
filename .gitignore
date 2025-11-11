@@ -160,3 +160,6 @@ cython_debug/
 #.idea/
 /.idea
 /data
+
+# filter lists
+*/filter_lists/
