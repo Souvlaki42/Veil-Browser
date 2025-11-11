@@ -3,7 +3,7 @@ name = "veil-browser"
 version = "2.0.0"
 description = "Privacy-first web browser designed to eliminate tracking, data collection, and intrusive analytics"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
     "adblock>=0.6.0",
     "psutil~=7.1.3",
