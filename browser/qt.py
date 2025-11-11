@@ -69,6 +69,7 @@ class TabWidget(QTabWidget):
         # Connect signals
         self.tabCloseRequested.connect(self.close_tab)
         self.currentChanged.connect(self._on_tab_changed)
+        self.tabBarDoubleClicked.connect(self._tab_open_doubleclick)
 
         # Create initial tab
         self.create_new_tab()
@@ -103,6 +104,10 @@ class TabWidget(QTabWidget):
             self._add_new_tab_button()
 
         return web_view
+
+    def _tab_open_doubleclick(self, i):
+        if i == -1:
+            self.create_new_tab()
 
     def close_tab(self, index: int) -> None:
         """Close a tab at the given index"""
