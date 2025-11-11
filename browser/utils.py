@@ -45,6 +45,8 @@ def read_config():
     with open(config_file, "w") as f:
         json.dump(merged_config, f, indent=2)
 
+    merged_config["remote_version"] = default_config["local_version"]
+
     return merged_config
 
 
