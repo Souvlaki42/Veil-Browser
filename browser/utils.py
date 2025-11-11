@@ -1,5 +1,4 @@
 from bisect import bisect_left
-import os
 import logging
 import json
 from functools import cache
@@ -26,15 +25,15 @@ def deep_merge(default: dict, user: dict) -> dict:
 def read_config():
     """Read the configuration file"""
     root_dir = Path(__file__).parent.parent
-    data_dir = os.path.join(root_dir, "data")
-    os.makedirs(data_dir, exist_ok=True)
-    config_file = os.path.join(data_dir, "config.json")
-    default_config_file = os.path.join(root_dir, "browser/default_config.json")
+    data_dir = root_dir / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    config_file = data_dir / "config.json"
+    default_config_file = root_dir / "browser/default_config.json"
 
     with open(default_config_file, "r") as f:
         default_config = json.load(f)
 
-    if not os.path.exists(config_file):
+    if not config_file.exists():
         with open(config_file, "w") as f:
             json.dump(default_config, f, indent=2)
         return default_config
@@ -58,12 +57,12 @@ def setup_logging():
     config = read_config()
 
     root_dir = Path(__file__).parent.parent
-    data_dir = os.path.join(root_dir, "data")
-    os.makedirs(data_dir, exist_ok=True)
-    log_dir = os.path.join(data_dir, "logs")
-    os.makedirs(log_dir, exist_ok=True)
+    data_dir = root_dir / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    log_dir = data_dir / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
 
-    log_file = os.path.join(log_dir, "veil_browser.log")
+    log_file = log_dir / "veil_browser.log"
 
     handlers: list[logging.Handler] = [logging.FileHandler(log_file, encoding="utf-8")]
 
@@ -83,8 +82,8 @@ def setup_logging():
 def get_icon_font():
     """Configure fonts for icons"""
     logger = setup_logging()
-    font_path = os.path.join(Path(__file__).parent, "icons.ttf")
-    font_id = QFontDatabase.addApplicationFont(font_path)
+    font_path = Path(__file__).parent / "icons.ttf"
+    font_id = QFontDatabase.addApplicationFont(str(font_path))
     if font_id == -1:
         logger.warning("Font file was not available!")
         return
