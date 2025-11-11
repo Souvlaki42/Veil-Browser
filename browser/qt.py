@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import QToolButton, QWidget, QTabWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QUrl, pyqtSignal
 
+from browser.history import append_to_favicons, append_to_history
 from browser.utils import get_icon_font, read_config, setup_logging
 
 
@@ -174,6 +175,9 @@ class TabWidget(QTabWidget):
             if self.widget(i) == web_view:
                 self.setTabIcon(i, icon)
                 break
+        page = web_view.page()
+        if page:
+            append_to_favicons(page, icon)
 
     def _on_tab_changed(self, index: int) -> None:
         """Handle tab change"""
@@ -207,6 +211,7 @@ class TabWidget(QTabWidget):
         if not page:
             return
         self._update_tab_title(view, page.title())
+        append_to_history(page)
 
     def request_dev_tools(self):
         tab = self.get_current_web_view()  # Get your current web view

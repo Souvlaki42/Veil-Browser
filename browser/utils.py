@@ -29,26 +29,23 @@ def read_config():
     data_dir.mkdir(parents=True, exist_ok=True)
     config_file = data_dir / "config.json"
     default_config_file = root_dir / "browser/default_config.json"
+    config = {}
 
     with open(default_config_file, "r") as f:
         default_config = json.load(f)
 
     if not config_file.exists():
-        with open(config_file, "w") as f:
-            json.dump(default_config, f, indent=2)
-        return default_config
+        config = default_config
 
     with open(config_file, "r") as f:
         user_config = json.load(f)
 
-    merged_config = deep_merge(default_config, user_config)
+    config = deep_merge(config, user_config)
 
     with open(config_file, "w") as f:
-        json.dump(merged_config, f, indent=2)
+        json.dump(config, f, indent=2)
 
-    merged_config["remote_version"] = default_config["local_version"]
-
-    return merged_config
+    return config
 
 
 @cache

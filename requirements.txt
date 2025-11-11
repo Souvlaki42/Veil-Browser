@@ -9,6 +9,10 @@ psutil>=7.1.3
 
 # For copying and pasting stuff in the clipboard
 pyperclip==1.11.0
+
+# Normalizing URLs for history managment
+url-normalize==2.2.1
+
 # Python version requirement (documented for reference)
 # Requires Python >=3.12
 

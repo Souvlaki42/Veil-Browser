@@ -43,10 +43,7 @@ def main():
         logger.info(f"System: {platform.platform()}")
         logger.info(f"Python: {sys.version}")
         logger.info(f"Chromium: {qWebEngineChromiumVersion()}")
-        if config["local_version"] < config["remote_version"]:
-            logger.warning(
-                "There is an update available! Click here: https://github.com/Souvlaki42/Veil-Browser"
-            )
+        logger.info(f"Configuration: {config}")
 
         try:
             mem = psutil.virtual_memory()

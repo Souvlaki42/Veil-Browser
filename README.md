@@ -16,8 +16,8 @@ _Privacy-first web browsing, reimagined_
 **Developer**: [umaera](https://github.com/NotYarazi) \
 **Original Creator**: [ThatSINEWAVE](https://github.com/ThatSINEWAVE)
 
-
 ## Features
+
 <table>
 <tr>
 <td width="50%">
@@ -103,9 +103,10 @@ python main.py
 
 - `data/config.json` - Browser settings
 - `data/history.json` - Browsing history
+- `data/favicons.json` - Cached favicons
 - `data/logs/` - Application logs
 <div align="center">
-  
+
 ## Roadmap
 
 <table>
