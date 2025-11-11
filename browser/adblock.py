@@ -1,4 +1,5 @@
-import os
+from pathlib import Path
+from urllib.request import urlretrieve
 from PyQt6.QtWebEngineCore import (
     QWebEngineUrlRequestInfo,
     QWebEngineUrlRequestInterceptor,
@@ -19,15 +20,25 @@ class AdBlockInterceptor(QWebEngineUrlRequestInterceptor):
 
     def load_filters(self):
         """Load adblock filter lists"""
-        filter_lists = next(os.walk("filter_lists"), (None, None, []))[2]
+        filter_lists_dir = Path(__file__).parent / "filter_lists"
+        filter_lists_dir.mkdir(parents=True, exist_ok=True)
+
+        filter_lists = {
+            "easylist.txt": "https://easylist.to/easylist/easylist.txt",
+            "easyprivacy.txt": "https://easylist.to/easylist/easyprivacy.txt",
+            "fanboy-annoyance.txt": "https://secure.fanboy.co.nz/fanboy-annoyance.txt",
+            "fanboy-cookiemonster.txt": "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt",
+            "fanboy-social.txt": "https://easylist.to/easylist/fanboy-social.txt",
+        }
 
         all_rules = []
-        for filter_file in filter_lists:
+        for filter_name, filter_url in filter_lists.items():
+            filter_file = filter_lists_dir / filter_name
             try:
                 with open(filter_file, "r", encoding="utf-8") as f:
                     all_rules.extend(f.readlines())
             except FileNotFoundError:
-                print(f"Filter list not found: {filter_file}")
+                urlretrieve(filter_url, filter_file)
 
         # Build filter set
         filter_set = adblock.FilterSet()
