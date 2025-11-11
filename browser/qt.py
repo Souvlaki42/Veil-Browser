@@ -88,6 +88,7 @@ class TabWidget(QTabWidget):
         web_view.loadStarted.connect(
             lambda: self._update_tab_title(web_view, "Loading...")
         )
+        web_view.loadFinished.connect(self._on_load_finished)
         web_view.iconChanged.connect(lambda icon: self._update_tab_icon(web_view, icon))
 
         # Add tab
@@ -167,6 +168,15 @@ class TabWidget(QTabWidget):
         new_tab_btn.setText("+")
         new_tab_btn.setToolTip("New Tab")
         self.setCornerWidget(new_tab_btn)
+
+    def _on_load_finished(self) -> None:
+        view = self.get_current_web_view()
+        if not view:
+            return
+        page = view.page()
+        if not page:
+            return
+        self._update_tab_title(view, page.title())
 
     def request_dev_tools(self):
         tab = self.get_current_web_view()  # Get your current web view
