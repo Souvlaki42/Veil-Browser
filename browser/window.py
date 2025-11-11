@@ -57,6 +57,7 @@ class VeilBrowser(QMainWindow):
         # Tab widget with web views
         self.tab_widget = TabWidget()
         self.tab_widget.current_url_changed.connect(self.update_url)
+        self.tab_widget.last_tab_closed.connect(self.close)
 
         layout = QVBoxLayout(main_widget)
         layout.setContentsMargins(1, 1, 1, 1)

@@ -53,6 +53,9 @@ class TabWidget(QTabWidget):
     # Signal emitted when the current URL changes
     current_url_changed = pyqtSignal(QUrl)
 
+    # Signal emitted when window's last tab is closed
+    last_tab_closed = pyqtSignal()
+
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.config = read_config()
@@ -103,16 +106,38 @@ class TabWidget(QTabWidget):
 
     def close_tab(self, index: int) -> None:
         """Close a tab at the given index"""
-        if self.count() <= 1 and not self.config["close_after_last_tab"]:
-            # Don't close the last tab, just navigate to homepage
-            web_view = self.widget(index)
-            if isinstance(web_view, QWebEngineView):
-                web_view.setUrl(QUrl(self.config["homepage"]))
-            return
+        if self.count() <= 1:
+            if not self.config["close_after_last_tab"]:
+                web_view = self.widget(index)
+                if isinstance(web_view, QWebEngineView):
+                    web_view.setUrl(QUrl(self.config["homepage"]))
+                return
+            else:
+                # Clean up and emit signal
+                widget = self.widget(index)
+                if widget:
+                    if isinstance(widget, QWebEngineView):
+                        page = widget.page()
+                        if not page:
+                            return
+                        page.deleteLater()
 
-        # Remove the tab
+                    self.removeTab(index)
+                    widget.deleteLater()
+
+                # Emit signal for parent to handle
+                self.last_tab_closed.emit()
+                return
+
+        # Normal tab closing
         widget = self.widget(index)
         if widget:
+            if isinstance(widget, QWebEngineView):
+                page = widget.page()
+                if not page:
+                    return
+                page.deleteLater()
+
             self.removeTab(index)
             widget.deleteLater()
 
