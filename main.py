@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QFont, QIcon
 
 from browser.window import VeilBrowser
-from browser.data import read_config, setup_logging
+from browser.utils import read_config, setup_logging
 
 # Set up logging
 logger = setup_logging()

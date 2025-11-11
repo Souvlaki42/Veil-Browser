@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QToolButton, QWidget, QTabWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QUrl, pyqtSignal
 
-from browser.data import get_icon_font, read_config, setup_logging
+from browser.utils import get_icon_font, read_config, setup_logging
 
 
 class ToolButton(QToolButton):

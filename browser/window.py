@@ -12,7 +12,7 @@ from PyQt6.QtCore import QPoint, QUrl, Qt
 from PyQt6.QtGui import QIcon, QKeySequence, QShortcut
 
 from browser.adblock import AdBlockInterceptor
-from browser.data import read_config, setup_logging
+from browser.utils import read_config, setup_logging
 from browser.qt import ToolButton, TabWidget
 
 import pyperclip

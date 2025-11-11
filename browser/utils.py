@@ -1,6 +1,5 @@
 import os
 import logging
-import shutil
 import json
 from functools import cache
 from pathlib import Path
@@ -8,24 +7,45 @@ from pathlib import Path
 from PyQt6.QtGui import QFont, QFontDatabase
 
 
+def deep_merge(default: dict, user: dict) -> dict:
+    """Merge user config with default config, adding missing keys"""
+    result = default.copy()
+
+    for key, value in user.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            result[key] = deep_merge(result[key], value)
+        else:
+            result[key] = value
+
+    return result
+
+
 @cache
 def read_config():
     """Read the configuration file"""
-
     root_dir = Path(__file__).parent.parent
     data_dir = os.path.join(root_dir, "data")
     os.makedirs(data_dir, exist_ok=True)
     config_file = os.path.join(data_dir, "config.json")
+    default_config_file = os.path.join(root_dir, "browser/default_config.json")
+
+    with open(default_config_file, "r") as f:
+        default_config = json.load(f)
 
     if not os.path.exists(config_file):
-        _ = shutil.copyfile(
-            os.path.join(root_dir, "browser/default_config.json"),
-            config_file,
-            follow_symlinks=True,
-        )
+        with open(config_file, "w") as f:
+            json.dump(default_config, f, indent=2)
+        return default_config
 
     with open(config_file, "r") as f:
-        return json.load(f)
+        user_config = json.load(f)
+
+    merged_config = deep_merge(default_config, user_config)
+
+    with open(config_file, "w") as f:
+        json.dump(merged_config, f, indent=2)
+
+    return merged_config
 
 
 @cache

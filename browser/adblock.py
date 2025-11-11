@@ -5,7 +5,7 @@ from PyQt6.QtWebEngineCore import (
 )
 import adblock
 
-from browser.data import setup_logging
+from browser.utils import setup_logging
 
 ResourceType = QWebEngineUrlRequestInfo.ResourceType
 
