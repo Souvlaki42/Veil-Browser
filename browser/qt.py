@@ -216,9 +216,11 @@ class TabWidget(QTabWidget):
         if not page:
             return
 
-        # Create a new window/view for DevTools
         devtools_page = QWebEnginePage()
-
-        # Connect the inspector to the current page
         page.setDevToolsPage(devtools_page)
         page.triggerAction(QWebEnginePage.WebAction.InspectElement)
+
+    def set_zoom_level(self, level: int):
+        view = self.get_current_web_view()
+        if view:
+            view.setZoomFactor(level / 100)

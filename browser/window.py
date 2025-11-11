@@ -12,7 +12,7 @@ from PyQt6.QtCore import QPoint, QUrl, Qt
 from PyQt6.QtGui import QIcon, QKeySequence, QShortcut
 
 from browser.adblock import AdBlockInterceptor
-from browser.utils import read_config, setup_logging
+from browser.utils import StepCycler, read_config, setup_logging
 from browser.qt import ToolButton, TabWidget
 
 import pyperclip
@@ -50,6 +50,29 @@ class VeilBrowser(QMainWindow):
 
         ad_blocker = AdBlockInterceptor()
         self.profile.setUrlRequestInterceptor(ad_blocker)
+
+        zoom_levels = [
+            25,
+            33,
+            50,
+            67,
+            75,
+            80,
+            90,
+            100,
+            110,
+            125,
+            150,
+            175,
+            200,
+            250,
+            300,
+            400,
+            500,
+        ]
+        self.zoom_cycler = StepCycler(
+            zoom_levels, initial_value=self.config["zoom_level"]
+        )
 
     def init_ui(self):
         main_widget = QWidget()
@@ -171,6 +194,24 @@ class VeilBrowser(QMainWindow):
         duplicate_tab = QShortcut(QKeySequence("Ctrl+D"), self)
         duplicate_tab.activated.connect(
             lambda: self.tab_widget.create_new_tab(self.address_bar.text())
+        )
+
+        # Reset zoom level: Ctrl+0
+        reset_zoom = QShortcut(QKeySequence("Ctrl+0"), self)
+        reset_zoom.activated.connect(
+            lambda: self.tab_widget.set_zoom_level(self.zoom_cycler.reset())
+        )
+
+        # Increase zoom level: Ctrl+=
+        increase_zoom = QShortcut(QKeySequence("Ctrl+="), self)
+        increase_zoom.activated.connect(
+            lambda: self.tab_widget.set_zoom_level(self.zoom_cycler.up())
+        )
+
+        # Decrease zoom level: Ctrl+-
+        decrease_zoom = QShortcut(QKeySequence("Ctrl+-"), self)
+        decrease_zoom.activated.connect(
+            lambda: self.tab_widget.set_zoom_level(self.zoom_cycler.down())
         )
 
     def create_new_tab(self):

@@ -1,8 +1,10 @@
+from bisect import bisect_left
 import os
 import logging
 import json
 from functools import cache
 from pathlib import Path
+from typing import List
 
 from PyQt6.QtGui import QFont, QFontDatabase
 
@@ -90,3 +92,46 @@ def get_icon_font():
     font = QFont(families[0])
     font.setPixelSize(16)
     return font
+
+
+class StepCycler:
+    def __init__(self, steps: List[int], initial_value: int | None = None):
+        self.steps = sorted(steps)
+
+        if initial_value is not None:
+            self.current_index = self._find_closest_index(initial_value)
+        else:
+            self.current_index = 0
+
+        self.initial_index = self.current_index
+
+    def _find_closest_index(self, value: int) -> int:
+        pos = bisect_left(self.steps, value)
+
+        if pos == 0:
+            return 0
+        if pos == len(self.steps):
+            return len(self.steps) - 1
+
+        before = self.steps[pos - 1]
+        after = self.steps[pos]
+
+        if after - value < value - before:
+            return pos
+        else:
+            return pos - 1
+
+    def up(self) -> int:
+        self.current_index = min(self.current_index + 1, len(self.steps) - 1)
+        return self.steps[self.current_index]
+
+    def down(self) -> int:
+        self.current_index = max(self.current_index - 1, 0)
+        return self.steps[self.current_index]
+
+    def current(self) -> int:
+        return self.steps[self.current_index]
+
+    def reset(self) -> int:
+        self.current_index = self.initial_index
+        return self.steps[self.current_index]
