@@ -3,5 +3,6 @@
   "homepage": "https://google.com",
   "search_engine": "https://google.com/search?q=%s",
   "stdout_log": true,
-  "icon_theme": "automatic"
+  "icon_theme": "automatic",
+  "close_after_last_tab": false
 }

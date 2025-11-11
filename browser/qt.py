@@ -103,7 +103,7 @@ class TabWidget(QTabWidget):
 
     def close_tab(self, index: int) -> None:
         """Close a tab at the given index"""
-        if self.count() <= 1:
+        if self.count() <= 1 and not self.config["close_after_last_tab"]:
             # Don't close the last tab, just navigate to homepage
             web_view = self.widget(index)
             if isinstance(web_view, QWebEngineView):
