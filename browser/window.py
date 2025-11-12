@@ -1,5 +1,4 @@
 from PyQt6.QtWebEngineCore import QWebEngineProfile
-from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -13,7 +12,8 @@ from PyQt6.QtGui import QIcon, QKeySequence, QShortcut
 
 from browser.adblock import AdBlockInterceptor
 from browser.utils import StepCycler, read_config, setup_logging
-from browser.qt import ToolButton, TabWidget
+from browser.qt import ToolButton, WebView
+from browser.tabs import Tabs
 
 import pyperclip
 
@@ -41,7 +41,7 @@ class VeilBrowser(QMainWindow):
 
         self.instance = instance
 
-        self.devtools_view: QWebEngineView | None = None
+        self.devtools_view: WebView | None = None
 
         self.profile = QWebEngineProfile.defaultProfile()
         if not self.profile:
@@ -78,7 +78,7 @@ class VeilBrowser(QMainWindow):
         main_widget = QWidget()
 
         # Tab widget with web views
-        self.tab_widget = TabWidget()
+        self.tab_widget = Tabs()
         self.tab_widget.current_url_changed.connect(self.update_url)
         self.tab_widget.last_tab_closed.connect(self.close)
 
@@ -130,7 +130,7 @@ class VeilBrowser(QMainWindow):
 
     def toggle_devtools(self):
         if self.devtools_view is None or not self.devtools_view.isVisible():
-            self.devtools_view = QWebEngineView()
+            self.devtools_view = WebView()
             self.devtools_view.setWindowTitle("Developer Tools")
             self.devtools_view.resize(1024, 600)
 
