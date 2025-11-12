@@ -3,55 +3,52 @@ import logging
 import json
 from functools import cache
 from pathlib import Path
-from typing import List
+from typing import List, Literal
+from dataclasses import asdict, dataclass
 
 from PyQt6.QtGui import QFont, QFontDatabase
 
 
-def deep_merge(default: dict, user: dict) -> dict:
-    """Merge user config with default config, adding missing keys"""
-    result = default.copy()
+@dataclass
+class Config:
+    local_version: str = "2.0.0"
+    homepage: str = "https://google.com"
+    search_engine: str = "https://google.com/search?q=%s"
+    stdout_log: bool = True
+    icon_theme: Literal["automatic", "system"] | str = "automatic"
+    close_after_last_tab: bool = False
+    zoom_level: int = 100
 
-    for key, value in user.items():
-        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
-            result[key] = deep_merge(result[key], value)
+    @classmethod
+    @cache
+    def load(cls):
+        root_dir = Path(__file__).parent.parent
+        data_dir = root_dir / "data"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        config_file = data_dir / "config.json"
+
+        if config_file.exists():
+            with open(config_file, "r") as f:
+                user_config = json.load(f)
+                config = cls(**user_config)
         else:
-            result[key] = value
+            config = cls()
 
-    return result
+        with open(config_file, "w") as f:
+            json.dump(asdict(config), f, indent=2)
 
+        return config
 
-@cache
-def read_config():
-    """Read the configuration file"""
-    root_dir = Path(__file__).parent.parent
-    data_dir = root_dir / "data"
-    data_dir.mkdir(parents=True, exist_ok=True)
-    config_file = data_dir / "config.json"
-    default_config_file = root_dir / "browser/default_config.json"
-    config = {}
-
-    with open(default_config_file, "r") as f:
-        default_config = json.load(f)
-
-    if not config_file.exists():
-        config = default_config
-
-    with open(config_file, "r") as f:
-        user_config = json.load(f)
-
-    config = deep_merge(config, user_config)
-
-    with open(config_file, "w") as f:
-        json.dump(config, f, indent=2)
-
-    return config
+    @classmethod
+    def reload(cls):
+        cls.load.cache_clear()
+        return cls.load()
 
 
 @cache
 def setup_logging():
     """Configure logging system"""
-    config = read_config()
+    config = Config.load()
 
     root_dir = Path(__file__).parent.parent
     data_dir = root_dir / "data"
@@ -63,7 +60,7 @@ def setup_logging():
 
     handlers: list[logging.Handler] = [logging.FileHandler(log_file, encoding="utf-8")]
 
-    if config["stdout_log"]:
+    if config.stdout_log:
         handlers.append(logging.StreamHandler())
 
     logging.basicConfig(

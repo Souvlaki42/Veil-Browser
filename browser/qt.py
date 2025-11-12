@@ -3,7 +3,7 @@ from PyQt6.QtGui import QColor, QContextMenuEvent, QIcon, QPalette
 from PyQt6.QtWidgets import QToolButton, QWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-from browser.utils import get_icon_font, read_config, setup_logging
+from browser.utils import get_icon_font, Config, setup_logging
 
 
 class ToolButton(QToolButton):
@@ -20,17 +20,17 @@ class ToolButton(QToolButton):
         self, icon_text: str, theme_icon: QIcon.ThemeIcon, is_dark: bool | None = True
     ) -> None:
         logger = setup_logging()
-        config = read_config()
+        config = Config.load()
         icon = QIcon.fromTheme(theme_icon)
 
         try:
-            if config["icon_theme"] == "system":
+            if config.icon_theme == "system":
                 self.setIcon(icon)
                 return
-            elif config["icon_theme"] == "automatic":
+            elif config.icon_theme == "automatic":
                 color = QColor("white") if is_dark else QColor("#333333")
             else:
-                color = QColor(config["icon_theme"])
+                color = QColor(config.icon_theme)
 
             palette = self.palette()
             icon_font = get_icon_font()

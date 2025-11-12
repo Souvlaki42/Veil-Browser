@@ -11,7 +11,7 @@ from PyQt6.QtCore import QPoint, QUrl, Qt
 from PyQt6.QtGui import QIcon, QKeySequence, QShortcut
 
 from browser.adblock import AdBlockInterceptor
-from browser.utils import StepCycler, read_config, setup_logging
+from browser.utils import Config, StepCycler, setup_logging
 from browser.qt import ToolButton, WebView
 from browser.tabs import Tabs
 
@@ -25,7 +25,7 @@ class VeilBrowser(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.config = read_config()
+        self.config = Config.load()
         self.init_window()
         self.init_ui()
 
@@ -70,9 +70,7 @@ class VeilBrowser(QMainWindow):
             400,
             500,
         ]
-        self.zoom_cycler = StepCycler(
-            zoom_levels, initial_value=self.config["zoom_level"]
-        )
+        self.zoom_cycler = StepCycler(zoom_levels, initial_value=self.config.zoom_level)
 
     def init_ui(self):
         main_widget = QWidget()
@@ -92,7 +90,7 @@ class VeilBrowser(QMainWindow):
         self.forward_btn = ToolButton(self.go_forward)
         self.refresh_btn = ToolButton(self.refresh_page)
         self.home_btn = ToolButton(
-            lambda: self.navigate(self.config["homepage"]),
+            lambda: self.navigate(self.config.homepage),
         )
         self.address_bar: QLineEdit = QLineEdit()
         self.address_bar.returnPressed.connect(lambda: self.navigate(None))
@@ -277,7 +275,7 @@ class VeilBrowser(QMainWindow):
                 url = QUrl("https://" + text)
             else:
                 # Search query
-                search_url = str(self.config["search_engine"]).replace("%s", text)
+                search_url = str(self.config.search_engine).replace("%s", text)
                 url = QUrl(search_url)
 
         # Navigate current tab

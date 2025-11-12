@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QFont, QIcon
 
 from browser.window import VeilBrowser
-from browser.utils import read_config, setup_logging
+from browser.utils import Config, setup_logging
 
 # Set up logging
 logger = setup_logging()
@@ -16,17 +16,17 @@ logger = setup_logging()
 def main():
     """Main application entry point"""
     try:
-        config = read_config()
+        config = Config.load()
 
         logger.info("=" * 50)
-        logger.info(f"Veil Browser v{config['local_version']} (fork/remix by UmaEra)")
+        logger.info(f"Veil Browser v{config.local_version} (fork/remix by UmaEra)")
         logger.info("Starting...")
         logger.info("=" * 50)
 
         app = QApplication(sys.argv)
         app.setApplicationName("Veil Browser")
         app.setWindowIcon(QIcon("browser/logo.svg"))
-        app.setApplicationVersion(config["local_version"])
+        app.setApplicationVersion(config.local_version)
 
         # Font configuration
         try:

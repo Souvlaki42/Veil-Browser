@@ -4,7 +4,7 @@ from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtWidgets import QTabWidget, QWidget
 from browser.history import append_to_favicons, append_to_history
 from browser.qt import ToolButton, WebView
-from browser.utils import read_config, setup_logging
+from browser.utils import Config, setup_logging
 
 
 class Tabs(QTabWidget):
@@ -18,7 +18,7 @@ class Tabs(QTabWidget):
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        self.config = read_config()
+        self.config = Config.load()
         self.logger = setup_logging()
 
         # Configure tab widget
@@ -42,7 +42,7 @@ class Tabs(QTabWidget):
         if url:
             web_view.setUrl(QUrl(url))
         else:
-            web_view.setUrl(QUrl(self.config["homepage"]))
+            web_view.setUrl(QUrl(self.config.homepage))
 
         # Connect signals
         web_view.titleChanged.connect(
@@ -72,10 +72,10 @@ class Tabs(QTabWidget):
     def close_tab(self, index: int) -> None:
         """Close a tab at the given index"""
         if self.count() <= 1:
-            if not self.config["close_after_last_tab"]:
+            if not self.config.close_after_last_tab:
                 web_view = self.widget(index)
                 if isinstance(web_view, WebView):
-                    web_view.setUrl(QUrl(self.config["homepage"]))
+                    web_view.setUrl(QUrl(self.config.homepage))
                 return
             else:
                 # Clean up and emit signal
