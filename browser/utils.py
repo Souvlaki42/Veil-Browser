@@ -45,6 +45,54 @@ class Config:
         return cls.load()
 
 
+@dataclass
+class Keybindings:
+    new_tab: str = "Ctrl+T"
+    close_tab: str = "Ctrl+W"
+    next_tab: str = "Ctrl+Tab"
+    prev_tab: str = "Ctrl+Shift+Tab"
+    refresh_1: str = "F5"
+    refresh_2: str = "Ctrl+R"
+    address_focus: str = "Ctrl+L"
+    devtools_1: str = "F12"
+    devtools_2: str = "Ctrl+Shift+I"
+    page_source: str = "Ctrl+U"
+    print_page: str = "Ctrl+P"
+    save_as: str = "Ctrl+S"
+    copy_address: str = "Ctrl+Shift+C"
+    duplicate_tab: str = "Ctrl+D"
+    reset_zoom: str = "Ctrl+0"
+    increase_zoom: str = "Ctrl+="
+    decrease_zoom: str = "Ctrl+-"
+    open_config: str = "Ctrl+,"
+    reload_config: str = "Ctrl+Shift+,"
+
+    @classmethod
+    @cache
+    def load(cls):
+        root_dir = Path(__file__).parent.parent
+        data_dir = root_dir / "data"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        keybinds_file = data_dir / "keybinds.json"
+
+        if keybinds_file.exists():
+            with open(keybinds_file, "r") as f:
+                user_keybinds = json.load(f)
+                keybinds = cls(**user_keybinds)
+        else:
+            keybinds = cls()
+
+        with open(keybinds_file, "w") as f:
+            json.dump(asdict(keybinds), f, indent=2)
+
+        return keybinds
+
+    @classmethod
+    def reload(cls):
+        cls.load.cache_clear()
+        return cls.load()
+
+
 @cache
 def setup_logging():
     """Configure logging system"""

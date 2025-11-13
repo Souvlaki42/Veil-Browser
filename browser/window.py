@@ -11,7 +11,7 @@ from PyQt6.QtCore import QPoint, QUrl, Qt
 from PyQt6.QtGui import QIcon, QKeySequence, QShortcut
 
 from browser.adblock import AdBlockInterceptor
-from browser.utils import Config, StepCycler, setup_logging
+from browser.utils import Config, Keybindings, StepCycler, setup_logging
 from browser.qt import ToolButton, WebView
 from browser.tabs import Tabs
 
@@ -151,63 +151,73 @@ class VeilBrowser(QMainWindow):
 
     def setup_shortcuts(self):
         """Setup keyboard shortcuts for tab management"""
-        # New tab: Ctrl+T
-        new_tab_shortcut = QShortcut(QKeySequence("Ctrl+T"), self)
+        keybinds = Keybindings.load()
+
+        # New tab
+        new_tab_shortcut = QShortcut(QKeySequence(keybinds.new_tab), self)
         new_tab_shortcut.activated.connect(self.create_new_tab)
 
-        # Close tab: Ctrl+W
-        close_tab_shortcut = QShortcut(QKeySequence("Ctrl+W"), self)
+        # Close tab
+        close_tab_shortcut = QShortcut(QKeySequence(keybinds.close_tab), self)
         close_tab_shortcut.activated.connect(self.close_current_tab)
 
         # Next tab: Ctrl+Tab
-        next_tab_shortcut = QShortcut(QKeySequence("Ctrl+Tab"), self)
+        next_tab_shortcut = QShortcut(QKeySequence(keybinds.next_tab), self)
         next_tab_shortcut.activated.connect(self.next_tab)
 
         # Previous tab: Ctrl+Shift+Tab
-        prev_tab_shortcut = QShortcut(QKeySequence("Ctrl+Shift+Tab"), self)
+        prev_tab_shortcut = QShortcut(QKeySequence(keybinds.prev_tab), self)
         prev_tab_shortcut.activated.connect(self.previous_tab)
 
-        # Refresh: F5 or Ctrl+R
-        refresh_f5 = QShortcut(QKeySequence("F5"), self)
-        refresh_f5.activated.connect(self.refresh_page)
+        # Refresh
+        refresh_1 = QShortcut(QKeySequence(keybinds.refresh_1), self)
+        refresh_1.activated.connect(self.refresh_page)
 
-        refresh_ctrl_r = QShortcut(QKeySequence("Ctrl+R"), self)
-        refresh_ctrl_r.activated.connect(self.refresh_page)
+        refresh_2 = QShortcut(QKeySequence(keybinds.refresh_2), self)
+        refresh_2.activated.connect(self.refresh_page)
 
-        # Address bar focus: Ctrl+L
-        address_focus = QShortcut(QKeySequence("Ctrl+L"), self)
+        # Address bar focus
+        address_focus = QShortcut(QKeySequence(keybinds.address_focus), self)
         address_focus.activated.connect(self.focus_address_bar)
 
-        # Opening dev tools: F12 and Ctrl+Shift+I
-        devtools_f12_shortcut = QShortcut(QKeySequence("F12"), self)
-        devtools_f12_shortcut.activated.connect(self.toggle_devtools)
-        devtools_ctrl_shift_i_shortcut = QShortcut(QKeySequence("Ctrl+Shift+I"), self)
-        devtools_ctrl_shift_i_shortcut.activated.connect(self.toggle_devtools)
+        # Opening dev tools
+        devtools_1 = QShortcut(QKeySequence(keybinds.devtools_1), self)
+        devtools_1.activated.connect(self.toggle_devtools)
+        devtools_2 = QShortcut(QKeySequence(keybinds.devtools_2), self)
+        devtools_2.activated.connect(self.toggle_devtools)
 
-        # Copy address bar to clipboard: Ctrl+Shift+C
-        copy_address_shortcut = QShortcut(QKeySequence("Ctrl+Shift+C"), self)
+        # Page source
+        page_source_shortcut = QShortcut(QKeySequence(keybinds.page_source), self)
+        page_source_shortcut.activated.connect(
+            lambda: self.tab_widget.create_new_tab(
+                f"view-source:{self.address_bar.text()}"
+            )
+        )
+
+        # Copy address bar to clipboard
+        copy_address_shortcut = QShortcut(QKeySequence(keybinds.copy_address), self)
         copy_address_shortcut.activated.connect(self.copy_address_bar_to_clipboard)
 
-        # Duplicate tab: Ctrl+D
-        duplicate_tab = QShortcut(QKeySequence("Ctrl+D"), self)
+        # Duplicate tab
+        duplicate_tab = QShortcut(QKeySequence(keybinds.duplicate_tab), self)
         duplicate_tab.activated.connect(
             lambda: self.tab_widget.create_new_tab(self.address_bar.text())
         )
 
-        # Reset zoom level: Ctrl+0
-        reset_zoom = QShortcut(QKeySequence("Ctrl+0"), self)
+        # Reset zoom level
+        reset_zoom = QShortcut(QKeySequence(keybinds.reset_zoom), self)
         reset_zoom.activated.connect(
             lambda: self.tab_widget.set_zoom_level(self.zoom_cycler.reset())
         )
 
-        # Increase zoom level: Ctrl+=
-        increase_zoom = QShortcut(QKeySequence("Ctrl+="), self)
+        # Increase zoom level
+        increase_zoom = QShortcut(QKeySequence(keybinds.increase_zoom), self)
         increase_zoom.activated.connect(
             lambda: self.tab_widget.set_zoom_level(self.zoom_cycler.up())
         )
 
-        # Decrease zoom level: Ctrl+-
-        decrease_zoom = QShortcut(QKeySequence("Ctrl+-"), self)
+        # Decrease zoom level
+        decrease_zoom = QShortcut(QKeySequence(keybinds.decrease_zoom), self)
         decrease_zoom.activated.connect(
             lambda: self.tab_widget.set_zoom_level(self.zoom_cycler.down())
         )

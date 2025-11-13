@@ -102,7 +102,8 @@ python main.py
 ### Auto-created files:
 
 - `data/config.json` - Browser settings
-- `data/history.json` - Browsing history
+- `data/history.json` - Browser history
+- `data/keybinds.json` - Browser keybindings
 - `data/favicons.json` - Cached favicons
 - `data/logs/` - Application logs
 <div align="center">
