@@ -6,9 +6,10 @@ import hashlib
 
 from PyQt6.QtCore import QBuffer, QByteArray, QIODevice
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWebEngineCore import QWebEnginePage
 
 from url_normalize import url_normalize
+
+from browser.qt import WebPage
 
 
 def qicon_to_base64(icon: QIcon, size: tuple = (24, 24)) -> str:
@@ -33,7 +34,7 @@ def get_favicon_id(domain: str) -> str:
     return f"fav_{domain_hash}"
 
 
-def append_to_history(page: QWebEnginePage):
+def append_to_history(page: WebPage):
     """Append to the history file"""
 
     root_dir = Path(__file__).parent.parent
@@ -85,7 +86,7 @@ def append_to_history(page: QWebEnginePage):
     return history
 
 
-def append_to_favicons(page: QWebEnginePage, icon: QIcon | None = None):
+def append_to_favicons(page: WebPage, icon: QIcon | None = None):
     """Append to the favicon file"""
 
     root_dir = Path(__file__).parent.parent

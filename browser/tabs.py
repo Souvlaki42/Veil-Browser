@@ -1,9 +1,8 @@
 from PyQt6.QtCore import QUrl, pyqtSignal
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtWidgets import QTabWidget, QWidget
 from browser.history import append_to_favicons, append_to_history
-from browser.qt import ToolButton, WebView
+from browser.qt import ToolButton, WebPage, WebView
 from browser.utils import Config, setup_logging
 
 
@@ -180,9 +179,9 @@ class Tabs(QTabWidget):
         if not page:
             return
 
-        devtools_page = QWebEnginePage()
+        devtools_page = WebPage()
         page.setDevToolsPage(devtools_page)
-        page.triggerAction(QWebEnginePage.WebAction.InspectElement)
+        page.triggerAction(WebPage.WebAction.InspectElement)
 
     def set_zoom_level(self, level: int):
         view = self.get_current_web_view()

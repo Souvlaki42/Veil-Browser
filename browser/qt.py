@@ -1,5 +1,6 @@
 from collections.abc import Callable
-from PyQt6.QtGui import QColor, QContextMenuEvent, QIcon, QPalette
+from PyQt6.QtGui import QColor, QIcon, QPalette
+from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtWidgets import QToolButton, QWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
@@ -45,24 +46,5 @@ class ToolButton(QToolButton):
             logger.warning(f"[ICON FAILURE] {e}")
 
 
-class WebView(QWebEngineView):
-    def __init__(self, parent: QWidget | None = None) -> None:
-        return super().__init__(parent)
-
-    def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
-        if not a0:
-            return
-
-        page = self.page()
-        if not page:
-            return super().contextMenuEvent(a0)
-
-        self.menu = self.createStandardContextMenu()
-        if not self.menu:
-            return super().contextMenuEvent(a0)
-
-        actions = self.menu.actions()
-        for action in actions:
-            pass
-
-        self.menu.popup(a0.globalPos())
+WebView = QWebEngineView
+WebPage = QWebEnginePage
