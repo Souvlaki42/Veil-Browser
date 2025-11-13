@@ -1,21 +1,37 @@
 from collections.abc import Callable
-from PyQt6.QtGui import QColor, QIcon, QPalette
+from typing import Any, TypeAlias
+from PyQt6.QtCore import pyqtBoundSignal
+from PyQt6.QtGui import QAction, QColor, QIcon, QPalette
 from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtWidgets import QToolButton, QWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-from browser.utils import get_icon_font, Config, setup_logging
+from browser.utils import (
+    get_icon_font,
+    Config,
+    setup_logging,
+)
+
+WebView: TypeAlias = QWebEngineView
+WebPage: TypeAlias = QWebEnginePage
+WebAction: TypeAlias = WebPage.WebAction
 
 
 class ToolButton(QToolButton):
     def __init__(
         self,
-        on_click: Callable[[], QWebEngineView | None] = lambda: None,
+        on_click: Callable[..., Any] | pyqtBoundSignal | QAction | None = lambda: None,
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
         self.setStyleSheet("QToolButton { padding: 5px; background: transparent; }")
-        _ = self.clicked.connect(on_click)
+
+        if not on_click:
+            return
+        elif isinstance(on_click, QAction):
+            self.clicked.connect(on_click.trigger)
+        else:
+            self.clicked.connect(on_click)
 
     def update_icon(
         self, icon_text: str, theme_icon: QIcon.ThemeIcon, is_dark: bool | None = True
@@ -44,7 +60,3 @@ class ToolButton(QToolButton):
                 self.setIcon(icon)
         except Exception as e:
             logger.warning(f"[ICON FAILURE] {e}")
-
-
-WebView = QWebEngineView
-WebPage = QWebEnginePage

@@ -1,3 +1,4 @@
+from pathlib import Path
 from PyQt6.QtWebEngineCore import QWebEngineProfile
 from PyQt6.QtWidgets import (
     QApplication,
@@ -8,11 +9,17 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 from PyQt6.QtCore import QPoint, QUrl, Qt
-from PyQt6.QtGui import QIcon, QKeySequence, QShortcut
+from PyQt6.QtGui import QIcon
 
 from browser.adblock import AdBlockInterceptor
-from browser.utils import Config, Keybindings, StepCycler, setup_logging
-from browser.qt import ToolButton, WebView
+from browser.utils import (
+    Config,
+    Keybindings,
+    StepCycler,
+    open_in_default_editor,
+    setup_logging,
+)
+from browser.qt import ToolButton, WebAction, WebView
 from browser.tabs import Tabs
 
 import pyperclip
@@ -76,9 +83,9 @@ class VeilBrowser(QMainWindow):
         main_widget = QWidget()
 
         # Tab widget with web views
-        self.tab_widget = Tabs()
-        self.tab_widget.current_url_changed.connect(self.update_url)
-        self.tab_widget.last_tab_closed.connect(self.close)
+        self.tabs = Tabs()
+        self.tabs.current_url_changed.connect(self.update_url)
+        self.tabs.last_tab_closed.connect(self.close)
 
         layout = QVBoxLayout(main_widget)
         layout.setContentsMargins(1, 1, 1, 1)
@@ -86,9 +93,14 @@ class VeilBrowser(QMainWindow):
 
         # Navigation bar
         nav_bar = QHBoxLayout()
-        self.back_btn = ToolButton(self.go_back)
-        self.forward_btn = ToolButton(self.go_forward)
-        self.refresh_btn = ToolButton(self.refresh_page)
+        web_view = self.tabs.get_current_web_view()
+        if web_view:
+            page = web_view.page()
+            if page:
+                self.back_btn = ToolButton(page.action(WebAction.Back))
+                self.forward_btn = ToolButton(page.action(WebAction.Forward))
+                self.refresh_btn = ToolButton(page.action(WebAction.Reload))
+
         self.home_btn = ToolButton(
             lambda: self.navigate(self.config.homepage),
         )
@@ -112,7 +124,7 @@ class VeilBrowser(QMainWindow):
         nav_bar.addWidget(self.address_bar)
 
         layout.addLayout(nav_bar)
-        layout.addWidget(self.tab_widget)
+        layout.addWidget(self.tabs)
 
         self.setCentralWidget(main_widget)
 
@@ -134,7 +146,7 @@ class VeilBrowser(QMainWindow):
 
             devtools_page = self.devtools_view.page()
 
-            web_view = self.tab_widget.get_current_web_view()
+            web_view = self.tabs.get_current_web_view()
             if not web_view:
                 logger.info("Web view is not found!")
                 return
@@ -151,99 +163,121 @@ class VeilBrowser(QMainWindow):
 
     def setup_shortcuts(self):
         """Setup keyboard shortcuts for tab management"""
+        web_view = self.tabs.get_current_web_view()
+        if not web_view:
+            return
+        page = web_view.page()
+        if not page:
+            return
+
         keybinds = Keybindings.load()
 
         # New tab
-        new_tab_shortcut = QShortcut(QKeySequence(keybinds.new_tab), self)
-        new_tab_shortcut.activated.connect(self.create_new_tab)
+        keybinds.bind_shortcuts("new_tab", self.create_new_tab, self)
 
         # Close tab
-        close_tab_shortcut = QShortcut(QKeySequence(keybinds.close_tab), self)
-        close_tab_shortcut.activated.connect(self.close_current_tab)
+        keybinds.bind_shortcuts("close_tab", self.close_current_tab, self)
 
-        # Next tab: Ctrl+Tab
-        next_tab_shortcut = QShortcut(QKeySequence(keybinds.next_tab), self)
-        next_tab_shortcut.activated.connect(self.next_tab)
+        # Next tab
+        keybinds.bind_shortcuts("next_tab", self.next_tab, self)
 
-        # Previous tab: Ctrl+Shift+Tab
-        prev_tab_shortcut = QShortcut(QKeySequence(keybinds.prev_tab), self)
-        prev_tab_shortcut.activated.connect(self.previous_tab)
+        # Previous tab
+        keybinds.bind_shortcuts("prev_tab", self.previous_tab, self)
+
+        # Previous page
+        keybinds.bind_shortcuts("prev_page", page.action(WebAction.Back), self)
+
+        # Next page
+        keybinds.bind_shortcuts("next_page", page.action(WebAction.Forward), self)
 
         # Refresh
-        refresh_1 = QShortcut(QKeySequence(keybinds.refresh_1), self)
-        refresh_1.activated.connect(self.refresh_page)
-
-        refresh_2 = QShortcut(QKeySequence(keybinds.refresh_2), self)
-        refresh_2.activated.connect(self.refresh_page)
+        keybinds.bind_shortcuts("refresh", page.action(WebAction.Reload), self)
 
         # Address bar focus
-        address_focus = QShortcut(QKeySequence(keybinds.address_focus), self)
-        address_focus.activated.connect(self.focus_address_bar)
+        keybinds.bind_shortcuts("address_focus", self.focus_address_bar, self)
 
         # Opening dev tools
-        devtools_1 = QShortcut(QKeySequence(keybinds.devtools_1), self)
-        devtools_1.activated.connect(self.toggle_devtools)
-        devtools_2 = QShortcut(QKeySequence(keybinds.devtools_2), self)
-        devtools_2.activated.connect(self.toggle_devtools)
+        keybinds.bind_shortcuts("devtools", self.toggle_devtools, self)
 
-        # Page source
-        page_source_shortcut = QShortcut(QKeySequence(keybinds.page_source), self)
-        page_source_shortcut.activated.connect(
-            lambda: self.tab_widget.create_new_tab(
-                f"view-source:{self.address_bar.text()}"
-            )
-        )
+        # TODO FIX: Page source
+        keybinds.bind_shortcuts("page_source", page.action(WebAction.ViewSource), self)
+
+        # TODO: print page shortcut
+
+        # TODO: save as shortcut
 
         # Copy address bar to clipboard
-        copy_address_shortcut = QShortcut(QKeySequence(keybinds.copy_address), self)
-        copy_address_shortcut.activated.connect(self.copy_address_bar_to_clipboard)
+        keybinds.bind_shortcuts(
+            "copy_address", self.copy_address_bar_to_clipboard, self
+        )
 
         # Duplicate tab
-        duplicate_tab = QShortcut(QKeySequence(keybinds.duplicate_tab), self)
-        duplicate_tab.activated.connect(
-            lambda: self.tab_widget.create_new_tab(self.address_bar.text())
+        keybinds.bind_shortcuts(
+            "duplicate_tab",
+            lambda: self.tabs.create_new_tab(self.address_bar.text()),
+            self,
         )
 
         # Reset zoom level
-        reset_zoom = QShortcut(QKeySequence(keybinds.reset_zoom), self)
-        reset_zoom.activated.connect(
-            lambda: self.tab_widget.set_zoom_level(self.zoom_cycler.reset())
+        keybinds.bind_shortcuts(
+            "reset_zoom",
+            lambda: self.tabs.set_zoom_level(self.zoom_cycler.reset()),
+            self,
         )
 
         # Increase zoom level
-        increase_zoom = QShortcut(QKeySequence(keybinds.increase_zoom), self)
-        increase_zoom.activated.connect(
-            lambda: self.tab_widget.set_zoom_level(self.zoom_cycler.up())
+        keybinds.bind_shortcuts(
+            "increase_zoom",
+            lambda: self.tabs.set_zoom_level(self.zoom_cycler.up()),
+            self,
         )
 
         # Decrease zoom level
-        decrease_zoom = QShortcut(QKeySequence(keybinds.decrease_zoom), self)
-        decrease_zoom.activated.connect(
-            lambda: self.tab_widget.set_zoom_level(self.zoom_cycler.down())
+        keybinds.bind_shortcuts(
+            "decrease_zoom",
+            lambda: self.tabs.set_zoom_level(self.zoom_cycler.down()),
+            self,
         )
+
+        # Open config shortcut
+        config_file_path = Path(__file__).parent.parent / "data/config.json"
+        if config_file_path.exists():
+            keybinds.bind_shortcuts(
+                "open_config", lambda: open_in_default_editor(config_file_path), self
+            )
+        else:
+            logger.warning("Didn't find configuration file!")
+
+        # TODO: Reload config
+        # keybinds.bind_shortcuts("reload_config", self.reload_config, self)
+
+    def reload_config(self):
+        Config.reload()
+        Keybindings.reload()
+        logger.info("Config and keybindings successfully reloaded!")
 
     def create_new_tab(self):
         """Create a new tab"""
-        self.tab_widget.create_new_tab()
+        self.tabs.create_new_tab()
 
     def close_current_tab(self):
         """Close the current tab"""
-        current_index = self.tab_widget.currentIndex()
-        self.tab_widget.close_tab(current_index)
+        current_index = self.tabs.currentIndex()
+        self.tabs.close_tab(current_index)
 
     def next_tab(self):
         """Switch to next tab"""
-        current = self.tab_widget.currentIndex()
-        count = self.tab_widget.count()
+        current = self.tabs.currentIndex()
+        count = self.tabs.count()
         next_index = (current + 1) % count
-        self.tab_widget.setCurrentIndex(next_index)
+        self.tabs.setCurrentIndex(next_index)
 
     def previous_tab(self):
         """Switch to previous tab"""
-        current = self.tab_widget.currentIndex()
-        count = self.tab_widget.count()
+        current = self.tabs.currentIndex()
+        count = self.tabs.count()
         prev_index = (current - 1) % count
-        self.tab_widget.setCurrentIndex(prev_index)
+        self.tabs.setCurrentIndex(prev_index)
 
     def focus_address_bar(self):
         """Focus the address bar and select all text"""
@@ -255,24 +289,6 @@ class VeilBrowser(QMainWindow):
         content = self.address_bar.text().strip()
         if not content == "":
             pyperclip.copy(content)
-
-    def go_back(self):
-        """Go back in current tab"""
-        web_view = self.tab_widget.get_current_web_view()
-        if web_view:
-            web_view.back()
-
-    def go_forward(self):
-        """Go forward in current tab"""
-        web_view = self.tab_widget.get_current_web_view()
-        if web_view:
-            web_view.forward()
-
-    def refresh_page(self):
-        """Refresh current tab"""
-        web_view = self.tab_widget.get_current_web_view()
-        if web_view:
-            web_view.reload()
 
     def navigate(self, input: str | None):
         text = input or self.address_bar.text()
@@ -289,7 +305,7 @@ class VeilBrowser(QMainWindow):
                 url = QUrl(search_url)
 
         # Navigate current tab
-        web_view = self.tab_widget.get_current_web_view()
+        web_view = self.tabs.get_current_web_view()
         if web_view:
             web_view.setUrl(url)
 

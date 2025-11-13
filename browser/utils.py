@@ -3,10 +3,14 @@ import logging
 import json
 from functools import cache
 from pathlib import Path
-from typing import List, Literal
-from dataclasses import asdict, dataclass
+import subprocess
+import sys
+from typing import Any, Callable, List, Literal
+from dataclasses import asdict, dataclass, field
 
-from PyQt6.QtGui import QFont, QFontDatabase
+from PyQt6.QtCore import pyqtBoundSignal
+from PyQt6.QtGui import QAction, QFont, QFontDatabase, QKeySequence, QShortcut
+from PyQt6.QtWidgets import QWidget
 
 
 @dataclass
@@ -45,27 +49,52 @@ class Config:
         return cls.load()
 
 
+KeybindingsType = Literal[
+    "new_tab",
+    "close_tab",
+    "next_tab",
+    "prev_tab",
+    "prev_page",
+    "next_page",
+    "refresh",
+    "address_focus",
+    "devtools",
+    "page_source",
+    "print_page",
+    "save_as",
+    "copy_address",
+    "duplicate_tab",
+    "reset_zoom",
+    "increase_zoom",
+    "decrease_zoom",
+    "open_config",
+    # TODO: find a way to make this work: "reload_config",
+]
+
+
 @dataclass
 class Keybindings:
-    new_tab: str = "Ctrl+T"
-    close_tab: str = "Ctrl+W"
-    next_tab: str = "Ctrl+Tab"
-    prev_tab: str = "Ctrl+Shift+Tab"
-    refresh_1: str = "F5"
-    refresh_2: str = "Ctrl+R"
-    address_focus: str = "Ctrl+L"
-    devtools_1: str = "F12"
-    devtools_2: str = "Ctrl+Shift+I"
-    page_source: str = "Ctrl+U"
-    print_page: str = "Ctrl+P"
-    save_as: str = "Ctrl+S"
-    copy_address: str = "Ctrl+Shift+C"
-    duplicate_tab: str = "Ctrl+D"
-    reset_zoom: str = "Ctrl+0"
-    increase_zoom: str = "Ctrl+="
-    decrease_zoom: str = "Ctrl+-"
-    open_config: str = "Ctrl+,"
-    reload_config: str = "Ctrl+Shift+,"
+    new_tab: list[str] = field(default_factory=lambda: ["Ctrl+T"])
+    close_tab: list[str] = field(default_factory=lambda: ["Ctrl+W"])
+    next_tab: list[str] = field(default_factory=lambda: ["Ctrl+Tab"])
+    prev_tab: list[str] = field(default_factory=lambda: ["Ctrl+Shift+Tab"])
+    prev_page: list[str] = field(default_factory=lambda: ["Alt+Left", "Alt+Backspace"])
+    next_page: list[str] = field(
+        default_factory=lambda: ["Alt+Right", "Alt+Shift+Backspace"]
+    )
+    refresh: list[str] = field(default_factory=lambda: ["F5", "Ctrl+R"])
+    address_focus: list[str] = field(default_factory=lambda: ["Ctrl+L"])
+    devtools: list[str] = field(default_factory=lambda: ["F12", "Ctrl+Shift+I"])
+    page_source: list[str] = field(default_factory=lambda: ["Ctrl+U"])
+    print_page: list[str] = field(default_factory=lambda: ["Ctrl+P"])
+    save_as: list[str] = field(default_factory=lambda: ["Ctrl+S"])
+    copy_address: list[str] = field(default_factory=lambda: ["Ctrl+Shift+C"])
+    duplicate_tab: list[str] = field(default_factory=lambda: ["Ctrl+D"])
+    reset_zoom: list[str] = field(default_factory=lambda: ["Ctrl+0"])
+    increase_zoom: list[str] = field(default_factory=lambda: ["Ctrl+="])
+    decrease_zoom: list[str] = field(default_factory=lambda: ["Ctrl+-"])
+    open_config: list[str] = field(default_factory=lambda: ["Ctrl+,"])
+    reload_config: list[str] = field(default_factory=lambda: ["Ctrl+Shift+,"])
 
     @classmethod
     @cache
@@ -91,6 +120,29 @@ class Keybindings:
     def reload(cls):
         cls.load.cache_clear()
         return cls.load()
+
+    def sequences(self, name: KeybindingsType) -> list[QKeySequence]:
+        sequences: list[QKeySequence] = []
+        keybinds: set[str] = self.__getattribute__(name)
+        for keybind in keybinds:
+            sequences.append(QKeySequence(keybind))
+        return sequences
+
+    def bind_shortcuts(
+        self,
+        name: KeybindingsType,
+        action: Callable[..., Any] | pyqtBoundSignal | QAction | None = lambda: None,
+        parent: QWidget | None = None,
+    ) -> None:
+        sequences = self.sequences(name)
+        for sequence in sequences:
+            shortcut = QShortcut(sequence, parent)
+            if not action:
+                return
+            elif isinstance(action, QAction):
+                shortcut.activated.connect(action.trigger)
+            else:
+                shortcut.activated.connect(action)
 
 
 @cache
@@ -118,6 +170,17 @@ def setup_logging():
         handlers=handlers,
     )
     return logging.getLogger(__name__)
+
+
+def open_in_default_editor(filepath: str | Path):
+    filepath = str(Path(filepath).resolve())
+
+    if sys.platform == "darwin":
+        subprocess.run(["open", filepath], check=True)
+    elif sys.platform == "win32":
+        subprocess.run(["cmd", "/c", "start", "", filepath], check=True)
+    else:
+        subprocess.run(["xdg-open", filepath], check=True)
 
 
 @cache
