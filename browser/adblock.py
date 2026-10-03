@@ -1,10 +1,10 @@
+import os
 from pathlib import Path
-from urllib.request import urlretrieve
-from PyQt6.QtWebEngineCore import (
-    QWebEngineUrlRequestInfo,
-    QWebEngineUrlRequestInterceptor,
-)
+
 import adblock
+import requests
+from PyQt6.QtWebEngineCore import (QWebEngineUrlRequestInfo,
+                                   QWebEngineUrlRequestInterceptor)
 
 from browser.utils import setup_logging
 
@@ -15,6 +15,7 @@ class AdBlockInterceptor(QWebEngineUrlRequestInterceptor):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.adblock_engine = None
+
         self.load_filters()
         self.logger = setup_logging()
 
@@ -34,11 +35,14 @@ class AdBlockInterceptor(QWebEngineUrlRequestInterceptor):
         all_rules = []
         for filter_name, filter_url in filter_lists.items():
             filter_file = filter_lists_dir / filter_name
-            try:
-                with open(filter_file, "r", encoding="utf-8") as f:
-                    all_rules.extend(f.readlines())
-            except FileNotFoundError:
-                urlretrieve(filter_url, filter_file)
+
+            if not os.path.isfile(filter_file):
+                r = requests.get(filter_url)
+                with open(filter_file, "wb") as outfile:
+                    outfile.write(r.content)
+
+            with open(filter_file, "r", encoding="utf-8") as f:
+                all_rules.extend(f.readlines())
 
         # Build filter set
         filter_set = adblock.FilterSet()
