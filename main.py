@@ -1,5 +1,6 @@
 import platform
 import sys
+import subprocess
 from typing import cast
 
 import psutil
@@ -16,18 +17,21 @@ logger = setup_logging()
 
 def main():
     """Main application entry point"""
+    commit_hash = subprocess.run(
+        ["git", "rev-parse", "HEAD"], capture_output=True).stdout.decode(encoding="utf-8").removesuffix("\n").removesuffix("\r")
     try:
         config = Config.load()
 
         logger.info("=" * 50)
-        logger.info(f"Veil Browser v{config.local_version} (fork/remix by UmaEra)")
+        logger.info(f"Veil Browser (fork/remix by UmaEra)")
+        logger.info(f"Commit: {commit_hash}")
         logger.info("Starting...")
         logger.info("=" * 50)
 
         app = QApplication(sys.argv)
         app.setApplicationName("Veil Browser")
         app.setWindowIcon(QIcon("browser/logo.svg"))
-        app.setApplicationVersion(config.local_version)
+        app.setApplicationVersion(commit_hash)
 
         # Font configuration
         try:

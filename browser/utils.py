@@ -15,7 +15,6 @@ from PyQt6.QtWidgets import QWidget
 
 @dataclass
 class Config:
-    local_version: str = "2.0.0"
     homepage: str = "https://google.com"
     search_engine: str = "https://google.com/search?q=%s"
     stdout_log: bool = True
@@ -78,13 +77,15 @@ class Keybindings:
     close_tab: list[str] = field(default_factory=lambda: ["Ctrl+W"])
     next_tab: list[str] = field(default_factory=lambda: ["Ctrl+Tab"])
     prev_tab: list[str] = field(default_factory=lambda: ["Ctrl+Shift+Tab"])
-    prev_page: list[str] = field(default_factory=lambda: ["Alt+Left", "Alt+Backspace"])
+    prev_page: list[str] = field(default_factory=lambda: [
+                                 "Alt+Left", "Alt+Backspace"])
     next_page: list[str] = field(
         default_factory=lambda: ["Alt+Right", "Alt+Shift+Backspace"]
     )
     refresh: list[str] = field(default_factory=lambda: ["F5", "Ctrl+R"])
     address_focus: list[str] = field(default_factory=lambda: ["Ctrl+L"])
-    devtools: list[str] = field(default_factory=lambda: ["F12", "Ctrl+Shift+I"])
+    devtools: list[str] = field(default_factory=lambda: [
+                                "F12", "Ctrl+Shift+I"])
     page_source: list[str] = field(default_factory=lambda: ["Ctrl+U"])
     print_page: list[str] = field(default_factory=lambda: ["Ctrl+P"])
     save_as: list[str] = field(default_factory=lambda: ["Ctrl+S"])
@@ -131,7 +132,8 @@ class Keybindings:
     def bind_shortcuts(
         self,
         name: KeybindingsType,
-        action: Callable[..., Any] | pyqtBoundSignal | QAction | None = lambda: None,
+        action: Callable[...,
+                         Any] | pyqtBoundSignal | QAction | None = lambda: None,
         parent: QWidget | None = None,
     ) -> None:
         sequences = self.sequences(name)
@@ -158,7 +160,8 @@ def setup_logging():
 
     log_file = log_dir / "veil_browser.log"
 
-    handlers: list[logging.Handler] = [logging.FileHandler(log_file, encoding="utf-8")]
+    handlers: list[logging.Handler] = [
+        logging.FileHandler(log_file, encoding="utf-8")]
 
     if config.stdout_log:
         handlers.append(logging.StreamHandler())
