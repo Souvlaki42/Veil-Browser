@@ -1,13 +1,14 @@
-import sys
 import platform
+import sys
 from typing import cast
+
 import psutil
+from PyQt6.QtGui import QFont, QIcon
 from PyQt6.QtWebEngineCore import qWebEngineChromiumVersion
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QFont, QIcon
 
-from browser.window import VeilBrowser
 from browser.utils import Config, setup_logging
+from browser.window import VeilBrowser
 
 # Set up logging
 logger = setup_logging()
@@ -35,10 +36,6 @@ def main():
         except Exception as e:
             logger.warning(f"Font setup failed: {e}")
 
-        # Create and show browser
-        browser = VeilBrowser()
-        browser.show()
-
         # System info logging
         logger.info(f"System: {platform.platform()}")
         logger.info(f"Python: {sys.version}")
@@ -51,6 +48,10 @@ def main():
             logger.info(f"Memory Available: {mem_available:.1f} GB")
         except Exception as e:
             logger.error(f"[ERR] Memory check failed: {e}")
+
+        # Create and show browser
+        browser = VeilBrowser()
+        browser.show()
 
         exit_code = app.exec()
         sys.exit(exit_code)

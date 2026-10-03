@@ -12,10 +12,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-pyqt = [
-    "PyQt6>=6.10.0",
-    "PyQt6-WebEngine>=6.10.0",
-]
+pyqt = ["PyQt6>=6.10.0", "PyQt6-WebEngine>=6.10.0"]
 
 [tool.basedpyright]
 typeCheckingMode = "standard"
