@@ -57,10 +57,12 @@ _Privacy-first web browsing, reimagined_
 
 ### Prerequisites
 
-- **Python 3.12+** → [Download here](https://www.python.org/downloads/)
-- **UV Package Manager** (virtual environment - optional) → [Install UV](https://docs.astral.sh/uv/getting-started/installation/#installation-methods)
+- **Python 3.14+** → [Download here](https://www.python.org/downloads/)
+- **UV Package Manager** (optional) → [Install UV](https://docs.astral.sh/uv/getting-started/installation/#installation-methods)
 
-### Installation (virtual environment)
+### Installation
+
+Easiest method with virtual environment:
 
 ```bash
 # 1. Clone the repository
@@ -76,11 +78,16 @@ uv run main.py
 ```
 
 <details>
-<summary><b>Arch Linux Installation</b></summary>
+<summary><b>With system packages</b></summary>
+
+Some Linux distributions provide system packages that include proprietary codecs by linking with your system's ffmpeg.
 
 ```bash
-# Install system packages for codec support
+# Install system packages for codec support on Arch Linux
 sudo pacman -Sy --needed python-pyqt6 python-pyqt6-webengine
+
+# Install system packages for codec support on Fedora
+sudo dnf install python3-pyqt6-devel python3-pyqt6-webengine-devel
 
 # Create environment with system packages
 uv venv --system-site-packages
@@ -90,11 +97,11 @@ uv sync
 </details>
 
 <details>
-<summary><b>Alternative: Install without virtual enviroment</b></summary>
+<summary><b>Install without virtual enviroment</b></summary>
 
 ```bash
-pip install -r requirements.txt
-python main.py
+pip3 install -r requirements.txt
+python3 main.py
 ```
 
 </details>
