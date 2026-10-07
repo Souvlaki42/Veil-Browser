@@ -48,7 +48,7 @@ class VeilBrowser(QMainWindow):
 
         self.instance = instance
 
-        self.devtools_view: WebView | None = None
+        self.devtools: WebView = WebView()
 
         self.profile = QWebEngineProfile.defaultProfile()
         if not self.profile:
@@ -77,7 +77,8 @@ class VeilBrowser(QMainWindow):
             400,
             500,
         ]
-        self.zoom_cycler = StepCycler(zoom_levels, initial_value=self.config.zoom_level)
+        self.zoom_cycler = StepCycler(
+            zoom_levels, initial_value=self.config.zoom_level)
 
     def init_ui(self):
         main_widget = QWidget()
@@ -133,18 +134,20 @@ class VeilBrowser(QMainWindow):
 
     def _update_icon_colors(self, color_scheme: Qt.ColorScheme | None):
         is_dark: bool = color_scheme == Qt.ColorScheme.Dark
-        self.back_btn.update_icon("arrow_back", QIcon.ThemeIcon.GoPrevious, is_dark)
-        self.forward_btn.update_icon("arrow_forward", QIcon.ThemeIcon.GoNext, is_dark)
-        self.refresh_btn.update_icon("refresh", QIcon.ThemeIcon.ViewRefresh, is_dark)
+        self.back_btn.update_icon(
+            "arrow_back", QIcon.ThemeIcon.GoPrevious, is_dark)
+        self.forward_btn.update_icon(
+            "arrow_forward", QIcon.ThemeIcon.GoNext, is_dark)
+        self.refresh_btn.update_icon(
+            "refresh", QIcon.ThemeIcon.ViewRefresh, is_dark)
         self.home_btn.update_icon("home", QIcon.ThemeIcon.GoHome, is_dark)
 
     def toggle_devtools(self):
-        if self.devtools_view is None or not self.devtools_view.isVisible():
-            self.devtools_view = WebView()
-            self.devtools_view.setWindowTitle("Developer Tools")
-            self.devtools_view.resize(1024, 600)
+        if not self.devtools.isVisible():
+            self.devtools.setWindowTitle("Developer Tools")
+            self.devtools.resize(1024, 600)
 
-            devtools_page = self.devtools_view.page()
+            devtools_page = self.devtools.page()
 
             web_view = self.tabs.get_current_web_view()
             if not web_view:
@@ -157,9 +160,9 @@ class VeilBrowser(QMainWindow):
                 return
 
             page.setDevToolsPage(devtools_page)
-            self.devtools_view.show()
+            self.devtools.show()
         else:
-            self.devtools_view.hide()
+            self.devtools.hide()
 
     def setup_shortcuts(self):
         """Setup keyboard shortcuts for tab management"""
@@ -188,7 +191,8 @@ class VeilBrowser(QMainWindow):
         keybinds.bind_shortcuts("prev_page", page.action(WebAction.Back), self)
 
         # Next page
-        keybinds.bind_shortcuts("next_page", page.action(WebAction.Forward), self)
+        keybinds.bind_shortcuts(
+            "next_page", page.action(WebAction.Forward), self)
 
         # Refresh
         keybinds.bind_shortcuts("refresh", page.action(WebAction.Reload), self)
@@ -200,7 +204,8 @@ class VeilBrowser(QMainWindow):
         keybinds.bind_shortcuts("devtools", self.toggle_devtools, self)
 
         # TODO FIX: Page source
-        keybinds.bind_shortcuts("page_source", page.action(WebAction.ViewSource), self)
+        keybinds.bind_shortcuts(
+            "page_source", page.action(WebAction.ViewSource), self)
 
         # TODO: print page shortcut
 
@@ -243,7 +248,8 @@ class VeilBrowser(QMainWindow):
         config_file_path = Path(__file__).parent.parent / "data/config.json"
         if config_file_path.exists():
             keybinds.bind_shortcuts(
-                "open_config", lambda: open_in_default_editor(config_file_path), self
+                "open_config", lambda: open_in_default_editor(
+                    config_file_path), self
             )
         else:
             logger.warning("Didn't find configuration file!")
